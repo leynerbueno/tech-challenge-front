@@ -40,7 +40,7 @@ function TodayOrders() {
                                 <tr key={order.orderId}>
                                     <td>{order.orderId}</td>
                                     <td>{order.status}</td>
-                                    <td>{new Date(order.date).toLocaleString()}</td>
+                                    <td>{new Date(order.orderDate).toLocaleString()}</td>
                                     <td>{order.clientId}</td>
                                     <td>{order.waitTimeMinutes} min</td>
                                 </tr>
