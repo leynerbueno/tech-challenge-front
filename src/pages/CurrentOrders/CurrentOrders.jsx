@@ -16,6 +16,7 @@ function TodayOrders() {
         fetchOrders();
 
         const intervalId = setInterval(fetchOrders, 10000); // a cada 10 segundos
+        console.log(orders);
 
         return () => clearInterval(intervalId);
     }, []);
@@ -47,7 +48,11 @@ function TodayOrders() {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="5">-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
                             </tr>
                         )}
                     </tbody>
