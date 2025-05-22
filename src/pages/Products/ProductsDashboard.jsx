@@ -6,6 +6,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 function ProductDashboard() {
     const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedProductId, setSelectedProductId] = useState(null);
     const [editData, setEditData] = useState({
@@ -20,6 +21,7 @@ function ProductDashboard() {
 
     useEffect(() => {
         fetchProducts();
+        fetchCategories();
     }, []);
 
     const fetchProducts = () => {
@@ -31,7 +33,12 @@ function ProductDashboard() {
             .finally(() => setLoading(false));
     };
 
-    if (loading) return <div className="text-center mt-5">Carregando produtos...</div>;
+    const fetchCategories = () => {
+        axios
+            .get("http://localhost:8080/api/product/list-categorys")
+            .then((res) => setCategories(res.data))
+            .catch((err) => console.error("Erro ao carregar categorias:", err));
+    };
 
     const handleDelete = () => {
         if (!selectedProductId) return;
@@ -83,6 +90,8 @@ function ProductDashboard() {
         const { name, value } = e.target;
         setEditData((prev) => ({ ...prev, [name]: value }));
     };
+
+    if (loading) return <div className="text-center mt-5">Carregando produtos...</div>;
 
     return (
         <div className="container mt-5">
@@ -158,7 +167,7 @@ function ProductDashboard() {
             <div className="modal fade" id="confirmDeleteModal" tabIndex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
-                        <div className="modal-header bg-danger text-white">
+                        <div className="modal-header bg-primary text-white">
                             <h5 className="modal-title">Confirmar Exclusão</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                         </div>
@@ -171,7 +180,7 @@ function ProductDashboard() {
                 </div>
             </div>
 
-            {/* Modal Edição e Adição */}
+            {/* Modal Edição e Adição com cabeçalho vermelho */}
             <div className="modal fade" id="editModal" tabIndex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
@@ -194,7 +203,19 @@ function ProductDashboard() {
                             </div>
                             <div className="mb-3">
                                 <label className="form-label">Categoria</label>
-                                <input type="text" className="form-control" name="category" value={editData.category} onChange={handleEditChange} />
+                                <select
+                                    className="form-select"
+                                    name="category"
+                                    value={editData.category}
+                                    onChange={handleEditChange}
+                                >
+                                    <option value="">Selecione...</option>
+                                    {categories.map((cat) => (
+                                        <option key={cat} value={cat}>
+                                            {cat.charAt(0) + cat.slice(1).toLowerCase()}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="form-check form-switch mb-3">
                                 <input

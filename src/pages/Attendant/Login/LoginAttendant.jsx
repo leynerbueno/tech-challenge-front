@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { validateCPF } from '../../../utils/cpfUtils.js';
 
-function Login() {
-    const [cpf, setCpf] = useState("");
+function LoginAttendant() {
+    let [cpf, setCpf] = useState("");
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
@@ -12,14 +13,13 @@ function Login() {
         setError(null);
 
         try {
-            //ALTERAR URL PARA URL REAL
-            const res = await axios.post("http://localhost:8080/login", { cpf });
+            cpf = validateCPF(cpf);
+            const res = await axios.get(`http://localhost:8080/cpf/${cpf}`);
             if (res.status === 200) {
-                navigate("/dashboard");
             }
-
+            
         } catch (err) {
-            setError("CPF inválido ou erro na autenticação");
+            setError("Usuário Inválido");
             navigate("/dashboard");
         }
     };
@@ -43,4 +43,4 @@ function Login() {
     );
 }
 
-export default Login;
+export default LoginAttendant;

@@ -28,10 +28,9 @@ function TodayOrders() {
                 <table className="table table-striped table-bordered rounded border border-secondary text-center">
                     <thead className="table-light">
                         <tr>
-                            <th className="text-black fs-5">Pedido ID</th>
+                            <th className="text-black fs-5">Cliente</th>
                             <th className="text-black fs-5">Status</th>
                             <th className="text-black fs-5">Data</th>
-                            <th className="text-black fs-5">Cliente</th>
                             <th className="text-black fs-5">Tempo de Espera (min)</th>
                         </tr>
                     </thead>
@@ -39,16 +38,14 @@ function TodayOrders() {
                         {orders.length > 0 ? (
                             orders.map((order) => (
                                 <tr key={order.orderId}>
-                                    <td>{order.orderId}</td>
+                                    <td>{order.customerName}</td>
                                     <td>{order.status}</td>
                                     <td>{new Date(order.orderDate).toLocaleString()}</td>
-                                    <td>{order.clientId}</td>
                                     <td>{order.waitTimeMinutes} min</td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td>-</td>
                                 <td>-</td>
                                 <td>-</td>
                                 <td>-</td>
