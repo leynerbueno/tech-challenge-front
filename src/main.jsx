@@ -7,6 +7,7 @@ import Dashboard from './pages/Attendant/Dashboard/Dashboard.jsx';
 import ProductDashboard from './pages/Products/ProductsDashboard.jsx';
 import LoginCustomer from './pages/Customer/Login/LoginCustomer.jsx';
 import CreateCustomer from './pages/Customer/CreateCustomer/CreateCustomer.jsx';
+import CreateAnonymousCustomer from './pages/Customer/CreateCustomer/CreateAnonymousCustomer.jsx';
 import CreateOrder from './pages/Order/CreateOrder/CreateOrder.jsx';
 
 
@@ -20,6 +21,7 @@ createRoot(document.getElementById('root')).render(
       <Route path="/products" element={<ProductDashboard />} />
       <Route path="/login-customer" element={<LoginCustomer />} />
       <Route path="/create-new-customer" element={<CreateCustomer />} />
+      <Route path="/create-new-anonymous-customer" element={<CreateAnonymousCustomer />} />
       <Route path="/create-order" element={<CreateOrder />} />
     </Routes>
   </BrowserRouter>

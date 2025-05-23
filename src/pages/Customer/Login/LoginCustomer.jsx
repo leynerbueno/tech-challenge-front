@@ -17,7 +17,7 @@ function LoginCustomer() {
         setError(null);
 
         try {
-            const cleanCPF = validateCPF(cpf); // valida e retorna o cpf limpo
+            const cleanCPF = validateCPF(cpf);
             setCpf(cleanCPF);
             const res = await axios.get(`http://localhost:8080/api/customer/cpf/${cleanCPF}`);
 
@@ -37,7 +37,7 @@ function LoginCustomer() {
     };
 
     const handleGuest = () => {
-        navigate("/dashboard");
+        navigate("/create-new-anonymous-customer");
     };
 
     const handleInsert = () => {
