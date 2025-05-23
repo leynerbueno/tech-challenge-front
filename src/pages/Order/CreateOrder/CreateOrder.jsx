@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 function CreateOrder() {
   const [categories, setCategories] = useState([]);
   const [productsByCategory, setProductsByCategory] = useState({});
-  const [selectedProducts, setSelectedProducts] = useState({});
+  const [selectedProducts, setSelectedProducts] = useState([]);
   const [categoryLoading, setCategoryLoading] = useState({});
   const [error, setError] = useState(null);
   const [pageLoading, setPageLoading] = useState(false);
@@ -68,34 +68,23 @@ function CreateOrder() {
 
   function toggleProduct(category, product) {
     setSelectedProducts(prev => {
-      const current = prev[category] || [];
-      const exists = current.find(p => p.id === product.id);
-
+      const exists = prev.find(p => p.id === product.id);
       if (exists) {
-        return {
-          ...prev,
-          [category]: current.filter(p => p.id !== product.id)
-        };
+        return prev.filter(p => p.id !== product.id);
       } else {
-        return {
-          ...prev,
-          [category]: [...current, { ...product, quantity: 1 }]
-        };
+        return [...prev, { ...product, category, quantity: 1 }];
       }
     });
   }
 
-  function updateQuantity(category, productId, quantity) {
-    setSelectedProducts(prev => {
-      const updatedList = prev[category].map(p =>
+  function updateQuantity(productId, quantity) {
+    setSelectedProducts(prev =>
+      prev.map(p =>
         p.id === productId ? { ...p, quantity: Number(quantity) } : p
-      );
-      return {
-        ...prev,
-        [category]: updatedList
-      };
-    });
+      )
+    );
   }
+
 
   function toggleCategory(category) {
     setExpandedCategories(prev => ({
@@ -115,13 +104,11 @@ function CreateOrder() {
         return;
       }
 
-      const items = Object.entries(selectedProducts).flatMap(([category, products]) =>
-        products.map(product => ({
-          productId: product.id,
-          quantity: product.quantity,
-          category
-        }))
-      );
+      const items = selectedProducts.map(product => ({
+        productId: product.id,
+        quantity: product.quantity,
+        category: product.category
+      }));
 
       const order = {
         customerId,
@@ -212,7 +199,8 @@ function CreateOrder() {
               <div className="row mt-3">
                 {Array.isArray(productsByCategory[category]) &&
                   productsByCategory[category].map(product => {
-                    const selected = (selectedProducts[category] || []).find(p => p.id === product.id);
+                    const selected = selectedProducts.find(p => p.id === product.id);
+
                     return (
                       <div key={product.id} className="col-md-4 mb-3">
                         <div className="card border border-danger shadow-sm h-100">
@@ -240,7 +228,7 @@ function CreateOrder() {
                                   min="1"
                                   className="form-control form-control-sm w-25"
                                   value={selected.quantity}
-                                  onChange={e => updateQuantity(category, product.id, e.target.value)}
+                                  onChange={e => updateQuantity(product.id, e.target.value)}
                                 />
                               )}
                             </div>
@@ -263,7 +251,7 @@ function CreateOrder() {
         <button
           className="btn btn-danger"
           onClick={handleConfirm}
-          disabled={Object.values(selectedProducts).flat().length === 0}
+          disabled={selectedProducts.length === 0}
         >
           Confirmar Pedido
         </button>
