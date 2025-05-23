@@ -20,7 +20,6 @@ function CreateOrder() {
   useEffect(() => {
     async function fetchCategories() {
       setPageLoading(true);
-
       try {
         const response = await axios.get("http://localhost:8080/api/product/list-availables-categorys");
         setCategories(response.data);
@@ -30,7 +29,6 @@ function CreateOrder() {
         setPageLoading(false);
       }
     }
-
     fetchCategories();
   }, []);
 
@@ -130,6 +128,7 @@ function CreateOrder() {
         items
       };
 
+      console.log(order.items);
       await axios.post("http://localhost:8080/api/order/save", order);
       setShowSuccessModal(true);
       setTimeout(() => navigate("/login-customer"), 3000);
@@ -139,7 +138,6 @@ function CreateOrder() {
       setErrorMessage('Erro ao criar pedido: ' + message);
     }
   }
-
 
   function handleCancel() {
     setShowCancelModal(true);
@@ -188,7 +186,6 @@ function CreateOrder() {
         </div>
       )}
 
-
       <h2 className="text-center mb-4">Monte seu Pedido</h2>
 
       {categories.map(category => (
@@ -218,26 +215,36 @@ function CreateOrder() {
                     const selected = (selectedProducts[category] || []).find(p => p.id === product.id);
                     return (
                       <div key={product.id} className="col-md-4 mb-3">
-                        <div className="d-flex align-items-center gap-2">
-                          <button
-                            type="button"
-                            className={`btn w-100 ${selected ? 'btn-danger text-white border border-2 border-danger' : 'btn-outline-danger'}`}
-                            onClick={e => {
-                              e.stopPropagation();
-                              toggleProduct(category, product);
-                            }}
-                          >
-                            {product.name}
-                          </button>
-                          {selected && (
-                            <input
-                              type="number"
-                              min="1"
-                              className="form-control w-25"
-                              value={selected.quantity}
-                              onChange={e => updateQuantity(category, product.id, e.target.value)}
-                            />
-                          )}
+                        <div className="card border border-danger shadow-sm h-100">
+                          <div className="card-body d-flex flex-column justify-content-between">
+                            <div>
+                              <h6 className="card-title text-danger">{product.name}</h6>
+                              <p className="card-text text-muted" style={{ fontSize: '0.9rem' }}>
+                                {product.description}
+                              </p>
+                            </div>
+                            <div className="d-flex align-items-center gap-2 mt-2">
+                              <button
+                                type="button"
+                                className={`btn btn-sm ${selected ? 'btn-danger' : 'btn-outline-danger'}`}
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  toggleProduct(category, product);
+                                }}
+                              >
+                                {selected ? 'Remover' : 'Selecionar'}
+                              </button>
+                              {selected && (
+                                <input
+                                  type="number"
+                                  min="1"
+                                  className="form-control form-control-sm w-25"
+                                  value={selected.quantity}
+                                  onChange={e => updateQuantity(category, product.id, e.target.value)}
+                                />
+                              )}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     );
@@ -283,7 +290,7 @@ function CreateOrder() {
         </div>
       )}
 
-      {/* ✅ Modal de sucesso customizado */}
+      {/* Modal de sucesso */}
       {showSuccessModal && (
         <div className="modal fade show d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog modal-dialog-centered" role="document">
