@@ -14,13 +14,14 @@ function LoginAttendant() {
 
         try {
             cpf = validateCPF(cpf);
-            const res = await axios.get(`http://localhost:8080/cpf/${cpf}`);
-            if (res.status === 200) {
-            }
-            
+            const res = await axios.get(`http://localhost:8080/api/attendant/cpf/${cpf}`);
+
+            const attendant = res.data;
+            localStorage.setItem("attendant", JSON.stringify(attendant));
+            navigate("/attendant-menu");
+
         } catch (err) {
             setError("Usuário Inválido");
-            navigate("/dashboard");
         }
     };
 

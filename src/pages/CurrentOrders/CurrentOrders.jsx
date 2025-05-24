@@ -8,7 +8,7 @@ function TodayOrders() {
     useEffect(() => {
         const fetchOrders = () => {
             axios
-                .get("http://localhost:8080/api/order-status/list-today-order-status/")
+                .get("http://localhost:8080/api/order/list-today-orders")
                 .then((res) => setOrders(res.data))
                 .catch((err) => console.error("Erro ao buscar pedidos:", err));
         };
@@ -40,7 +40,7 @@ function TodayOrders() {
                                 <tr key={order.orderId}>
                                     <td>{order.customerName}</td>
                                     <td>{order.status}</td>
-                                    <td>{new Date(order.orderDate).toLocaleString()}</td>
+                                    <td>{new Date(order.orderDt).toLocaleString()}</td>
                                     <td>{order.waitTimeMinutes} min</td>
                                 </tr>
                             ))

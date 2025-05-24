@@ -28,7 +28,6 @@ function LoginCustomer() {
             setEmail(customer.email);
 
             localStorage.setItem("customer", JSON.stringify(customer));
-
             navigate("/create-order")
 
         } catch (err) {
@@ -48,12 +47,12 @@ function LoginCustomer() {
         <div className="d-flex vh-100 bg-light">
             <div className="d-none d-md-flex flex-column justify-content-center align-items-center bg-danger text-white w-50">
                 <h1 className="display-4">Challenge</h1>
-                <p className="lead text-center px-5">Bem-vindo à nossa lanchonete! Escolha como deseja continuar:</p>
+                <p className="lead text-center px-4">Pronto para o desafio mais saboroso do dia?</p>
             </div>
 
             <div className="d-flex flex-column justify-content-center align-items-center w-100 w-md-50 px-4">
                 <form onSubmit={handleLogin} className="bg-white p-4 rounded shadow" style={{ maxWidth: 350, width: "100%" }}>
-                    <h4 className="mb-3 text-center">Identifique-se com CPF</h4>
+                    <h4 className="mb-3 text-center">Identifique-se</h4>
                     <input
                         type="text"
                         placeholder="Digite seu CPF"

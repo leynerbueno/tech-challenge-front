@@ -2,42 +2,32 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-function ProductDashboard() {
-    const [products, setProducts] = useState([]);
-    const [categories, setCategories] = useState([]);
+function AttendantDashboard() {
+    const [attendants, setAttendants] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [selectedProductId, setSelectedProductId] = useState(null);
+    const [selectedAttendantId, setSelectedAttendantId] = useState(null);
     const [editData, setEditData] = useState({
         id: "",
         name: "",
-        description: "",
-        price: "",
-        category: "",
-        status: "DISPONIVEL",
-        image: ""
+        cpf: "",
+        email: ""
     });
 
     useEffect(() => {
-        fetchProducts();
-        fetchCategories();
+        fetchAttendants();
     }, []);
 
-    const fetchProducts = () => {
+    const fetchAttendants = () => {
         setLoading(true);
         axios
             .get("http://localhost:8080/api/product/list")
-            .then((res) => setProducts(res.data))
+            .then((res) => setAttendants(res.data))
             .catch((err) => console.error("Erro ao carregar produtos:", err))
             .finally(() => setLoading(false));
     };
 
-    const fetchCategories = () => {
-        axios
-            .get("http://localhost:8080/api/product/list-categorys")
-            .then((res) => setCategories(res.data))
-            .catch((err) => console.error("Erro ao carregar categorias:", err));
-    };
 
     const handleDelete = () => {
         if (!selectedProductId) return;
@@ -64,23 +54,20 @@ function ProductDashboard() {
     };
 
     const openAddModal = () => {
-        setSelectedProductId(null);
+        setSelectedAttendantId(null);
         setEditData({
             id: "",
             name: "",
-            description: "",
-            price: "",
-            category: "",
-            status: "DISPONIVEL",
-            image: ""
+            cpf: "",
+            email: ""
         });
         const modal = new window.bootstrap.Modal(document.getElementById("editModal"));
         modal.show();
     };
 
-    const openEditModal = (product) => {
-        setSelectedProductId(product.id);
-        setEditData({ ...product });
+    const openEditModal = (attendant) => {
+        setSelectedAttendantId(attendant.id);
+        setEditData({ ...attendant });
         const modal = new window.bootstrap.Modal(document.getElementById("editModal"));
         modal.show();
     };
@@ -90,11 +77,11 @@ function ProductDashboard() {
         setEditData((prev) => ({ ...prev, [name]: value }));
     };
 
-    if (loading) return <div className="text-center mt-5">Carregando produtos...</div>;
+    if (loading) return <div className="text-center mt-5">Carregando atendentes...</div>;
 
     return (
         <div className="container mt-5">
-            <h2 className="text-center mb-4">Lista de Produtos</h2>
+            <h2 className="text-center mb-4">Lista de Atendnetes</h2>
             <div className="d-flex justify-content-end mb-2">
                 <button className="btn btn-success" onClick={openAddModal}>Adicionar</button>
             </div>
@@ -103,43 +90,24 @@ function ProductDashboard() {
                     <thead className="table-light">
                         <tr>
                             <th>Nome</th>
-                            <th>Descrição</th>
-                            <th>Preço</th>
-                            <th>Categoria</th>
-                            <th>Status</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {products.length === 0 ? (
+                        {attendants.length === 0 ? (
                             <tr>
-                                <td>-</td>
-                                <td>-</td>
-                                <td>-</td>
-                                <td>-</td>
                                 <td>-</td>
                                 <td>-</td>
                             </tr>
                         ) : (
-                            products.map((product) => (
-                                <tr key={product.id}>
-                                    <td>{product.name}</td>
-                                    <td>{product.description}</td>
-                                    <td>R$ {product.price.toFixed(2)}</td>
-                                    <td>{product.category}</td>
-                                    <td>
-                                        <span
-                                            className={`badge ${product.status === "DISPONIVEL" ? "bg-success" : "bg-danger"}`}
-                                            style={{ padding: "0.5em 1em", fontWeight: "600" }}
-                                        >
-                                            {product.status}
-                                        </span>
-                                    </td>
+                            attendants.map((attendant) => (
+                                <tr key={attendant.id}>
+                                    <td>{attendant.name}</td>
                                     <td>
                                         <button
                                             className="btn btn-link text-primary me-2"
                                             title="Editar"
-                                            onClick={() => openEditModal(product)}
+                                            onClick={() => openEditModal(attendant)}
                                         >
                                             <FontAwesomeIcon icon={faPen} />
                                         </button>
@@ -147,7 +115,7 @@ function ProductDashboard() {
                                             className="btn btn-link text-danger"
                                             title="Excluir"
                                             onClick={() => {
-                                                setSelectedProductId(product.id);
+                                                setSelectedAttendantId(attendant.id);
                                                 const modal = new window.bootstrap.Modal(document.getElementById("confirmDeleteModal"));
                                                 modal.show();
                                             }}
@@ -170,7 +138,7 @@ function ProductDashboard() {
                             <h5 className="modal-title">Confirmar Exclusão</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                         </div>
-                        <div className="modal-body">Tem certeza que deseja excluir este produto?</div>
+                        <div className="modal-body">Tem certeza que deseja excluir este atendente?</div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                             <button type="button" className="btn btn-danger" onClick={handleDelete}>Sim, Excluir</button>
@@ -184,7 +152,7 @@ function ProductDashboard() {
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header bg-primary text-white">
-                            <h5 className="modal-title">{editData.id ? "Editar Produto" : "Adicionar Produto"}</h5>
+                            <h5 className="modal-title">{editData.id ? "Editar Atendente" : "Adicionar Atendente"}</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                         </div>
                         <div className="modal-body">
@@ -193,45 +161,12 @@ function ProductDashboard() {
                                 <input type="text" className="form-control" name="name" value={editData.name} onChange={handleEditChange} />
                             </div>
                             <div className="mb-3">
-                                <label className="form-label">Descrição</label>
-                                <textarea className="form-control" name="description" value={editData.description} onChange={handleEditChange} />
+                                <label className="form-label">CPF</label>
+                                <textarea className="form-control" name="description" value='###.###.###-##' disabled />
                             </div>
                             <div className="mb-3">
-                                <label className="form-label">Preço</label>
-                                <input type="number" className="form-control" name="price" value={editData.price} onChange={handleEditChange} />
-                            </div>
-                            <div className="mb-3">
-                                <label className="form-label">Categoria</label>
-                                <select
-                                    className="form-select"
-                                    name="category"
-                                    value={editData.category}
-                                    onChange={handleEditChange}
-                                >
-                                    <option value="">Selecione...</option>
-                                    {categories.map((cat) => (
-                                        <option key={cat} value={cat}>
-                                            {cat.charAt(0) + cat.slice(1).toLowerCase()}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="form-check form-switch mb-3">
-                                <input
-                                    className="form-check-input"
-                                    type="checkbox"
-                                    id="statusSwitch"
-                                    checked={editData.status === "DISPONIVEL"}
-                                    onChange={(e) =>
-                                        setEditData((prev) => ({
-                                            ...prev,
-                                            status: e.target.checked ? "DISPONIVEL" : "INDISPONIVEL",
-                                        }))
-                                    }
-                                />
-                                <label className="form-check-label" htmlFor="statusSwitch">
-                                    {editData.status === "DISPONIVEL" ? "Disponível" : "Indisponível"}
-                                </label>
+                                <label className="form-label">Email</label>
+                                <input type="number" className="form-control" name="price" value={editData.email} onChange={handleEditChange} />
                             </div>
                         </div>
                         <div className="modal-footer">
@@ -245,4 +180,4 @@ function ProductDashboard() {
     );
 }
 
-export default ProductDashboard;
+export default AttendantDashboard;
