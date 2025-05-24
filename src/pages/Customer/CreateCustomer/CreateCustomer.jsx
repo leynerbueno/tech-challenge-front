@@ -19,7 +19,7 @@ function CreateCustomer() {
 
         try {
             const cleanCPF = validateCPF(cpf);
-            const res = await axios.post("http://localhost:8080/api/customer", {
+            const res = await axios.post("http://localhost:8080/api/user/customer", {
                 name,
                 cpf: cleanCPF,
                 email,

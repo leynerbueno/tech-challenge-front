@@ -15,7 +15,7 @@ function CreateAnonymousCustomer() {
         setSuccess(null);
 
         try {
-            const res = await axios.post("http://localhost:8080/api/customer", {
+            const res = await axios.post("http://localhost:8080/api/user/customer", {
                 name,
                 anonymous: true
             });

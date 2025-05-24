@@ -19,7 +19,7 @@ function LoginCustomer() {
         try {
             const cleanCPF = validateCPF(cpf);
             setCpf(cleanCPF);
-            const res = await axios.get(`http://localhost:8080/api/customer/cpf/${cleanCPF}`);
+            const res = await axios.get(`http://localhost:8080/api/user/customer/cpf/${cleanCPF}`);
 
             const customer = res.data;
             setId(customer.id);

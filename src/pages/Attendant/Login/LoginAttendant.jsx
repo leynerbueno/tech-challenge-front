@@ -14,7 +14,7 @@ function LoginAttendant() {
 
         try {
             cpf = validateCPF(cpf);
-            const res = await axios.get(`http://localhost:8080/api/attendant/cpf/${cpf}`);
+            const res = await axios.get(`http://localhost:8080/api/user/attendant/cpf/${cpf}`);
 
             const attendant = res.data;
             localStorage.setItem("attendant", JSON.stringify(attendant));
