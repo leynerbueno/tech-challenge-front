@@ -190,7 +190,7 @@ function OrderDashboard() {
                                             onClick={() => openStatusModal(order.orderId)}
                                             disabled={new Date(order.orderDt).toDateString() !== new Date().toDateString()}
                                         >
-                                            <FontAwesomeIcon icon={faRotate} />
+                                            <FontAwesomeIcon icon={faRotate}  className="text-primary"/>
                                         </button>
                                     </td>
                                 </tr>
