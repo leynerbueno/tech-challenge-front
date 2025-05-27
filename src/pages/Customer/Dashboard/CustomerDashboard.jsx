@@ -6,10 +6,10 @@ import { validateCPF } from '../../../utils/cpfUtils.js';
 
 
 
-function AttendantDashboard() {
-    const [attendants, setAttendants] = useState([]);
+function CustomerDashboard() {
+    const [customers, setCustomers] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [selectedAttendantId, setSelectedAttendantId] = useState(null);
+    const [selectedCustomerId, setSelectedCustomerId] = useState(null);
     const [error, setError] = useState(null);
     const [editData, setEditData] = useState({
         id: "",
@@ -19,37 +19,37 @@ function AttendantDashboard() {
     });
 
     useEffect(() => {
-        fetchAttendants();
+        fetchCustomers();
     }, []);
 
-    const fetchAttendants = () => {
+    const fetchCustomers = () => {
         setLoading(true);
         axios
-            .get("http://localhost:8080/api/user/attendant/list")
-            .then((res) => setAttendants(res.data))
+            .get("http://localhost:8080/api/user/customer/list")
+            .then((res) => setCustomers(res.data))
             .catch((err) => {
                 let message = err?.response?.data?.message || "Erro inesperado.";
-                console.error("Erro ao carregar atendentes:", message)
+                console.error("Erro ao carregar clientes:", message)
             })
             .finally(() => setLoading(false));
     };
 
 
     const handleDelete = () => {
-        if (!selectedAttendantId) return;
+        if (!selectedCustomerId) return;
         axios
-            .delete(`http://localhost:8080/api/user/attendant/delete/${selectedAttendantId}`)
+            .delete(`http://localhost:8080/api/user/customer/delete/${selectedCustomerId}`)
             .then(() => {
-                fetchAttendants();
+                fetchCustomers();
                 const modalEl = window.bootstrap.Modal.getInstance(document.getElementById("confirmDeleteModal"));
                 modalEl.hide();
-                setSelectedAttendantId(null);
+                setSelectedCustomerId(null);
             })
             .catch((err) => {
                 const modalEl = window.bootstrap.Modal.getInstance(document.getElementById("confirmDeleteModal"));
                 modalEl.hide();
                 let message = err?.response?.data?.message || "Erro inesperado.";;
-                setError("Erro ao excluir atendente: " + message);
+                setError("Erro ao excluir cliente: " + message);
             });
     };
 
@@ -64,17 +64,17 @@ function AttendantDashboard() {
             }
 
             if (editData.id) {
-                await axios.post(`http://localhost:8080/api/user/attendant/update`, editData);
+                await axios.post(`http://localhost:8080/api/user/customer/update`, editData);
             } else {
-                await axios.post(`http://localhost:8080/api/user/attendant`, editData);
+                await axios.post(`http://localhost:8080/api/user/customer`, editData);
             }
 
-            fetchAttendants();
+            fetchCustomers();
             const modalEl = window.bootstrap.Modal.getInstance(document.getElementById("editModal"));
             modalEl.hide();
         } catch (err) {
             let message = err?.response?.data?.message || "Erro inesperado.";
-            setError("Erro ao salvar atendente: " + message);
+            setError("Erro ao salvar cliente: " + message);
             const modalEl = window.bootstrap.Modal.getInstance(document.getElementById("editModal"));
             modalEl.hide();
         }
@@ -82,7 +82,7 @@ function AttendantDashboard() {
 
 
     const openAddModal = () => {
-        setSelectedAttendantId(null);
+        setSelectedCustomerId(null);
         setEditData({
             id: "",
             name: "",
@@ -93,9 +93,9 @@ function AttendantDashboard() {
         modal.show();
     };
 
-    const openEditModal = (attendant) => {
-        setSelectedAttendantId(attendant.id);
-        setEditData({ ...attendant });
+    const openEditModal = (customer) => {
+        setSelectedCustomerId(customer.id);
+        setEditData({ ...customer });
         const modal = new window.bootstrap.Modal(document.getElementById("editModal"));
         modal.show();
     };
@@ -105,7 +105,7 @@ function AttendantDashboard() {
         setEditData((prev) => ({ ...prev, [name]: value }));
     };
 
-    if (loading) return <div className="text-center mt-5">Carregando atendentes...</div>;
+    if (loading) return <div className="text-center mt-5">Carregando clientes...</div>;
 
     return (
         <div className="container mt-5">
@@ -115,7 +115,7 @@ function AttendantDashboard() {
                     <button type="button" className="btn-close" onClick={() => setError(null)}></button>
                 </div>
             )}
-            <h2 className="text-center mb-4">Lista de Atendentes</h2>
+            <h2 className="text-center mb-4">Lista de Clientes</h2>
 
             <div className="d-flex justify-content-end mb-2">
                 <button className="btn btn-success" onClick={openAddModal}>Adicionar</button>
@@ -131,22 +131,22 @@ function AttendantDashboard() {
                         </tr>
                     </thead>
                     <tbody>
-                        {attendants.length === 0 ? (
+                        {customers.length === 0 ? (
                             <tr>
                                 <td>-</td>
                                 <td>-</td>
                                 <td>-</td>
                             </tr>
                         ) : (
-                            attendants.map((attendant) => (
-                                <tr key={attendant.id}>
-                                    <td>{attendant.name}</td>
-                                    <td>{attendant.email}</td>
+                            customers.map((customer) => (
+                                <tr key={customer.id}>
+                                    <td>{customer.name}</td>
+                                    <td>{customer.email}</td>
                                     <td>
                                         <button
                                             className="btn btn-link text-primary me-2"
                                             title="Editar"
-                                            onClick={() => openEditModal(attendant)}
+                                            onClick={() => openEditModal(customer)}
                                         >
                                             <FontAwesomeIcon icon={faPen} />
                                         </button>
@@ -154,7 +154,7 @@ function AttendantDashboard() {
                                             className="btn btn-link text-danger"
                                             title="Excluir"
                                             onClick={() => {
-                                                setSelectedAttendantId(attendant.id);
+                                                setSelectedCustomerId(customer.id);
                                                 const modal = new window.bootstrap.Modal(document.getElementById("confirmDeleteModal"));
                                                 modal.show();
                                             }}
@@ -177,7 +177,7 @@ function AttendantDashboard() {
                             <h5 className="modal-title">Confirmar Exclusão</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                         </div>
-                        <div className="modal-body">Tem certeza que deseja excluir este atendente?</div>
+                        <div className="modal-body">Tem certeza que deseja excluir este cliente?</div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                             <button type="button" className="btn btn-danger" onClick={handleDelete}>Sim, Excluir</button>
@@ -191,7 +191,7 @@ function AttendantDashboard() {
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header bg-danger text-white">
-                            <h5 className="modal-title">{editData.id ? "Editar Atendente" : "Adicionar Atendente"}</h5>
+                            <h5 className="modal-title">{editData.id ? "Editar Cliente" : "Adicionar Cliente"}</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                         </div>
                         <div className="modal-body">
@@ -235,4 +235,4 @@ function AttendantDashboard() {
     );
 }
 
-export default AttendantDashboard;
+export default CustomerDashboard;

@@ -5,6 +5,7 @@ import CurrentOrderss from './pages/CurrentOrders/CurrentOrders.jsx';
 import LoginAttendant from './pages/Attendant/Login/LoginAttendant.jsx';
 import AttendantMenu from './pages/Attendant/Menu/AttendantMenu.jsx';
 import AttendantDashboard from './pages/Attendant/Dashboard/AttendantDashboard.jsx';
+import CustomerDashboard from './pages/Customer/Dashboard/CustomerDashboard.jsx';
 import OrderDashboard from './pages/Order/Dashboard/OrderDashboard.jsx';
 import ProductDashboard from './pages/Products/ProductsDashboard.jsx';
 import LoginCustomer from './pages/Customer/Login/LoginCustomer.jsx';
@@ -22,6 +23,7 @@ createRoot(document.getElementById('root')).render(
       <Route path="/attendant-menu" element={<AttendantMenu />} />
       <Route path="/orders" element={<OrderDashboard />} />
       <Route path="/attendants" element={<AttendantDashboard />} />
+      <Route path="/customers" element={<CustomerDashboard />} />
       <Route path="/products" element={<ProductDashboard />} />
       <Route path="/login-customer" element={<LoginCustomer />} />
       <Route path="/create-new-customer" element={<CreateCustomer />} />
