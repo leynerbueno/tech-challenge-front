@@ -7,8 +7,6 @@ function OrderDashboard() {
     const [orders, setOrders] = useState([]);
     const [filteredOrders, setFilteredOrders] = useState([]);
     const [statuses, setStatuses] = useState([]);
-    const [initialDt, setInitialDt] = useState("");
-    const [finalDt, setFinalDt] = useState("");
     const [statusFilter, setStatusFilter] = useState("");
     const [nameFilter, setNameFilter] = useState("");
     const [orderDetails, setOrderDetails] = useState(null);
@@ -17,8 +15,9 @@ function OrderDashboard() {
     const [selectedOrderId, setSelectedOrderId] = useState(null);
     const [newStatus, setNewStatus] = useState("");
     const [error, setError] = useState("");
-
     const today = new Date().toISOString().split("T")[0];
+    const [initialDt, setInitialDt] = useState(today);
+    const [finalDt, setFinalDt] = useState(today);
 
     useEffect(() => {
         axios.get("http://localhost:8080/api/order/list-status")
@@ -27,6 +26,10 @@ function OrderDashboard() {
                 let message = err?.response?.data?.message || "Erro inesperado.";;
                 setError("Erro ao carregar status: " + message)
             });
+    }, []);
+
+    useEffect(() => {
+        fetchOrders();
     }, []);
 
     useEffect(() => {
@@ -143,7 +146,7 @@ function OrderDashboard() {
                     <label className="form-label">Status:</label>
                     <select className="form-select" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
                         <option value="">Todos</option>
-                        {statuses.filter(status => !["PAGAMENTO_PENDENTE", "NAO_PAGO","PAGO"].includes(status))
+                        {statuses.filter(status => !["PAGAMENTO_PENDENTE", "NAO_PAGO", "PAGO"].includes(status))
                             .map((status, i) => (
                                 <option key={i} value={status}>{status}</option>
                             ))}
@@ -287,7 +290,8 @@ function OrderDashboard() {
                                 <label className="form-label">Selecione o novo Status:</label>
                                 <select className="form-select" value={newStatus} onChange={(e) => setNewStatus(e.target.value)}>
                                     <option value="">Selecione</option>
-                                    {statuses.map((status, i) => (
+                                    {statuses.filter(status => !["PAGAMENTO_PENDENTE", "NAO_PAGO", "PAGO"].includes(status))
+                                    .map((status, i) => (
                                         <option key={i} value={status}>{status}</option>
                                     ))}
                                 </select>
