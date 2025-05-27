@@ -31,7 +31,8 @@ function CreateAnonymousCustomer() {
             navigate("/create-order")
 
         } catch (err) {
-            setError("Erro ao cadastrar cliente. " + err.message);
+            let message = err?.response?.data?.message || "Erro inesperado.";;
+            setError("Erro ao cadastrar cliente. " + message);
         }
     };
 

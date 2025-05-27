@@ -31,6 +31,7 @@ function LoginCustomer() {
             navigate("/create-order")
 
         } catch (err) {
+            console.log(err?.response?.data?.message);
             setError("Usuário Inválido");
         }
     };

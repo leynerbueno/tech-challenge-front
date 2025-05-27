@@ -10,7 +10,10 @@ function TodayOrders() {
             axios
                 .get("http://localhost:8080/api/order/list-today-orders")
                 .then((res) => setOrders(res.data))
-                .catch((err) => console.error("Erro ao buscar pedidos:", err));
+                .catch((err) => {
+                    let message = err?.response?.data?.message || "Erro inesperado.";;
+                    setError("Erro ao buscar pedidos: ", message)
+                });
         };
 
         fetchOrders();
@@ -30,7 +33,6 @@ function TodayOrders() {
                         <tr>
                             <th className="text-black fs-5">Cliente</th>
                             <th className="text-black fs-5">Status</th>
-                            <th className="text-black fs-5">Data</th>
                             <th className="text-black fs-5">Tempo de Espera (min)</th>
                         </tr>
                     </thead>
@@ -40,13 +42,11 @@ function TodayOrders() {
                                 <tr key={order.orderId}>
                                     <td>{order.customerName}</td>
                                     <td>{order.status}</td>
-                                    <td>{new Date(order.orderDt).toLocaleString()}</td>
                                     <td>{order.waitTimeMinutes} min</td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td>-</td>
                                 <td>-</td>
                                 <td>-</td>
                                 <td>-</td>

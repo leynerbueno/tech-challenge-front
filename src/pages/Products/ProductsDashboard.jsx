@@ -28,7 +28,10 @@ function ProductDashboard() {
         axios
             .get("http://localhost:8080/api/product/list")
             .then((res) => setProducts(res.data))
-            .catch((err) => console.error("Erro ao carregar produtos:", err))
+            .catch((err) => {
+                let message = err?.response?.data?.message || "Erro inesperado.";;
+                setError("Erro ao carregar produtos: " + message)
+            })
             .finally(() => setLoading(false));
     };
 
@@ -36,7 +39,10 @@ function ProductDashboard() {
         axios
             .get("http://localhost:8080/api/product/list-categorys")
             .then((res) => setCategories(res.data))
-            .catch((err) => console.error("Erro ao carregar categorias:", err));
+            .catch((err) => {
+                let message = err?.response?.data?.message || "Erro inesperado.";;
+                setError("Erro ao carregar categorias:" + message)
+            });
     };
 
     const handleDelete = () => {
@@ -49,7 +55,10 @@ function ProductDashboard() {
                 const modalEl = window.bootstrap.Modal.getInstance(document.getElementById("confirmDeleteModal"));
                 modalEl.hide();
             })
-            .catch((err) => console.error("Erro ao excluir produto:", err));
+            .catch((err) => {
+                let message = err?.response?.data?.message || "Erro inesperado.";;
+                setError("Erro ao excluir produto:" + message)
+            });
     };
 
     const handleEditSubmit = () => {
@@ -60,7 +69,10 @@ function ProductDashboard() {
                 const modalEl = window.bootstrap.Modal.getInstance(document.getElementById("editModal"));
                 modalEl.hide();
             })
-            .catch((err) => console.error("Erro ao atualizar produto:", err));
+            .catch((err) => {
+                let message = err?.response?.data?.message || "Erro inesperado.";;
+                setError("Erro ao atualizar produto:" + message)
+            });
     };
 
     const openAddModal = () => {

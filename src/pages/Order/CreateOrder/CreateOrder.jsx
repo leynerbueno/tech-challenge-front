@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { QRCode } from 'react-qrcode-logo';
 
 function CreateOrder() {
   const [categories, setCategories] = useState([]);
@@ -13,7 +14,11 @@ function CreateOrder() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [paymentErrorMessage, setPaymentErrorMessage] = useState(null);
+  const [showPaymenModal, setShowPaymenModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [qrCodeData, setQrCodeData] = useState(null);
+  const [order, setOrder] = useState(null);
 
   const navigate = useNavigate();
 
@@ -24,7 +29,8 @@ function CreateOrder() {
         const response = await axios.get("http://localhost:8080/api/product/list-availables-categorys");
         setCategories(response.data);
       } catch (err) {
-        setError("Erro ao carregar categorias");
+        let message = err?.response?.data?.message || "Erro inesperado.";
+        setError("Erro ao carregar categorias: " + message);
       } finally {
         setPageLoading(false);
       }
@@ -42,12 +48,11 @@ function CreateOrder() {
         setCategoryLoading(prev => ({ ...prev, ...loadingMap }));
 
         try {
-          const response = await axios.get(
-            `http://localhost:8080/api/product/list-availables-by-category/${encodeURIComponent(category)}`
-          );
+          const response = await axios.get(`http://localhost:8080/api/product/list-availables-by-category/${encodeURIComponent(category)}`);
           productsMap[category] = response.data;
         } catch (err) {
-          setError("Erro ao carregar produtos");
+          let message = err?.response?.data?.message || "Erro inesperado.";
+          setError("Erro ao carregar produtos: " + message);
         }
 
         loadingMap[category] = false;
@@ -85,7 +90,6 @@ function CreateOrder() {
     );
   }
 
-
   function toggleCategory(category) {
     setExpandedCategories(prev => ({
       ...prev,
@@ -100,7 +104,7 @@ function CreateOrder() {
 
       if (!customerId) {
         setErrorMessage('Cliente não encontrado. Faça login novamente.');
-        navigate('/login-customer');
+        backToLogin();
         return;
       }
 
@@ -115,14 +119,38 @@ function CreateOrder() {
         items
       };
 
-      console.log(order.items);
-      await axios.post("http://localhost:8080/api/order/save", order);
-      setShowSuccessModal(true);
-      setTimeout(() => navigate("/login-customer"), 3000);
+      const orderResponse = await axios.post("http://localhost:8080/api/order/save", order);
+      const orderId = orderResponse.data.id;
+      setOrder(orderResponse.data);
+
+      const paymentResponse = await axios.post("http://localhost:8080/api/pagamento", { orderId });
+      setQrCodeData(paymentResponse.data.qrCodeImage);
+      setShowPaymenModal(true);
     } catch (err) {
-      let message = err?.response?.data;
       console.error(err);
+      let message = err?.response?.data?.message || "Erro inesperado.";
       setErrorMessage('Erro ao criar pedido: ' + message);
+    }
+  }
+
+  async function handleConfirmPayment() {
+    try {
+      const response = await axios.get(`http://localhost:8080/api/pagamento/${order.id}`);
+      const paymentStatus = response.data;
+
+      if (paymentStatus === "PENDING") {
+        setPaymentErrorMessage("Pagamento ainda não efetuado.");
+      } else if ((paymentStatus === "REJECTED") || (paymentStatus === "EXPIRED")) {
+        setPaymentErrorMessage("Pagamento rejeitado. Por favor, fale com um atendente.");
+      } else if (paymentStatus === "APPROVED") {
+        setShowPaymenModal(false);
+        setShowSuccessModal(true);
+        setTimeout(() => navigate("/login-customer"), 5000);
+      }
+    } catch (err) {
+      console.error(err);
+      let message = err?.response?.data?.message || "Erro inesperado.";
+      setPaymentErrorMessage('Erro ao verificar pagamento: ' + message);
     }
   }
 
@@ -132,7 +160,7 @@ function CreateOrder() {
 
   function confirmCancel() {
     setShowCancelModal(false);
-    navigate('/login-customer');
+    backToLogin();
   }
 
   function backToLogin() {
@@ -166,7 +194,7 @@ function CreateOrder() {
         </div>
       )}
 
-      {errorMessage && (
+      {errorMessage && !showPaymenModal && (
         <div className="alert alert-danger alert-dismissible fade show mt-3" role="alert">
           {errorMessage}
           <button type="button" className="btn-close" onClick={() => setErrorMessage(null)}></button>
@@ -278,6 +306,30 @@ function CreateOrder() {
         </div>
       )}
 
+      {/* Modal de Pagamento */}
+      {showPaymenModal && (
+        <div className="modal fade show d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-dialog-centered" role="document">
+            <div className="modal-content border border-2 border-danger">
+              <div className="modal-body text-center">
+                {qrCodeData && (
+                  <div className="d-flex flex-column align-items-center">
+                    <p className="fw-bold">Use o QR Code abaixo para efetuar o pagamento:</p>
+                    <QRCode value={qrCodeData} size={180} />
+                  </div>
+                )}
+                {paymentErrorMessage && (
+                  <div className="alert alert-danger mt-3" role="alert">
+                    {paymentErrorMessage}
+                  </div>
+                )}
+                <button className="btn btn-danger mt-4" onClick={handleConfirmPayment}>Confirmar Pagamento</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modal de sucesso */}
       {showSuccessModal && (
         <div className="modal fade show d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
@@ -286,9 +338,9 @@ function CreateOrder() {
               <div className="modal-header bg-danger text-white">
                 <h5 className="modal-title">Pedido criado com sucesso!</h5>
               </div>
-              <div className="modal-body">
-                <p className="mb-4">Muito obrigado por escolher a Challenge, volte sempre!</p>
-                <button className="btn btn-danger" onClick={backToLogin}>Voltar</button>
+              <div className="modal-body text-center">
+                <p className="mb-3">Muito obrigado por escolher a Challenge, volte sempre!</p>
+                <button className="btn btn-danger mt-4" onClick={backToLogin}>Voltar</button>
               </div>
             </div>
           </div>

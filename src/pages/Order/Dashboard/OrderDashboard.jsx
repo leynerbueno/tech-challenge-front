@@ -23,7 +23,10 @@ function OrderDashboard() {
     useEffect(() => {
         axios.get("http://localhost:8080/api/order/list-status")
             .then(res => setStatuses(res.data))
-            .catch(err => setError("Erro ao carregar status: " + err));
+            .catch(err => {
+                let message = err?.response?.data?.message || "Erro inesperado.";;
+                setError("Erro ao carregar status: " + message)
+            });
     }, []);
 
     useEffect(() => {
@@ -40,7 +43,10 @@ function OrderDashboard() {
                 setOrders(res.data);
                 applyFilters(res.data);
             })
-            .catch((err) => setError("Erro ao carregar pedidos: " + err));
+            .catch((err) => {
+                let message = err?.response?.data?.message || "Erro inesperado.";;
+                setError("Erro ao carregar pedidos: " + message)
+            });
     };
 
     const applyFilters = (ordersToFilter) => {
@@ -91,7 +97,7 @@ function OrderDashboard() {
             return;
         }
 
-        axios.post("http://localhost:8080/api/order-status/save", {
+        axios.post("http://localhost:8080/api/order/update-status", {
             orderId: selectedOrderId,
             attendantId: attendantId,
             status: newStatus
@@ -102,7 +108,8 @@ function OrderDashboard() {
             })
             .catch(err => {
                 closeStatusModal();
-                setError("Erro ao alterar status: " + err?.response?.data);
+                let message = err?.response?.data?.message || "Erro inesperado.";;
+                setError("Erro ao alterar status: " + message);
             });
     };
 
@@ -136,9 +143,10 @@ function OrderDashboard() {
                     <label className="form-label">Status:</label>
                     <select className="form-select" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
                         <option value="">Todos</option>
-                        {statuses.map((status, i) => (
-                            <option key={i} value={status}>{status}</option>
-                        ))}
+                        {statuses.filter(status => !["PAGAMENTO_PENDENTE", "NAO_PAGO","PAGO"].includes(status))
+                            .map((status, i) => (
+                                <option key={i} value={status}>{status}</option>
+                            ))}
                     </select>
                 </div>
                 <div>
@@ -190,7 +198,7 @@ function OrderDashboard() {
                                             onClick={() => openStatusModal(order.orderId)}
                                             disabled={new Date(order.orderDt).toDateString() !== new Date().toDateString()}
                                         >
-                                            <FontAwesomeIcon icon={faRotate}  className="text-primary"/>
+                                            <FontAwesomeIcon icon={faRotate} className="text-primary" />
                                         </button>
                                     </td>
                                 </tr>

@@ -24,7 +24,11 @@ function AttendantDashboard() {
         axios
             .get("http://localhost:8080/api/product/list")
             .then((res) => setAttendants(res.data))
-            .catch((err) => console.error("Erro ao carregar produtos:", err))
+            .catch((err) => {
+                let message = err?.response?.data?.message || "Erro inesperado.";;
+                console.error("Erro ao carregar produtos:", message)
+            })
+
             .finally(() => setLoading(false));
     };
 
@@ -39,7 +43,10 @@ function AttendantDashboard() {
                 const modalEl = window.bootstrap.Modal.getInstance(document.getElementById("confirmDeleteModal"));
                 modalEl.hide();
             })
-            .catch((err) => console.error("Erro ao excluir produto:", err));
+            .catch((err) => {
+                let message = err?.response?.data?.message || "Erro inesperado.";;
+                setError("Erro ao excluir produto:", message)
+            });
     };
 
     const handleEditSubmit = () => {
@@ -50,7 +57,10 @@ function AttendantDashboard() {
                 const modalEl = window.bootstrap.Modal.getInstance(document.getElementById("editModal"));
                 modalEl.hide();
             })
-            .catch((err) => console.error("Erro ao atualizar produto:", err));
+            .catch((err) => {
+                let message = err?.response?.data?.message || "Erro inesperado.";;
+                setError("Erro ao atualizar produto:", message)
+            });
     };
 
     const openAddModal = () => {
